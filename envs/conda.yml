@@ -25,6 +25,7 @@ dependencies:
 - immutables
 - pytest
 - types-dataclasses
+- recursivenodes
 
 - matplotlib-base
 - tikzplotlib

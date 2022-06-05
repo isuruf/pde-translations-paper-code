@@ -134,6 +134,7 @@ https://conda.anaconda.org/conda-forge/noarch/genpy-2021.1-pyhd3deb0d_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/matplotlib-base-3.5.2-py39h64a0072_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/pymbolic-2022.1-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/pyopencl-2022.1.5-py39hdd8ae6b_1.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/recursivenodes-0.2.0-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/clang_osx-64-13.0.1-h71a8856_2.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/codepy-2019.1-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/modepy-2021.1-pyhd8ed1ab_0.tar.bz2

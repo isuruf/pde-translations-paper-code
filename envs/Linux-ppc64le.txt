@@ -143,6 +143,7 @@ https://conda.anaconda.org/conda-forge/noarch/mako-1.2.0-pyhd8ed1ab_1.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/pip-22.1.2-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/pymbolic-2022.1-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-ppc64le/pytest-7.1.2-py39hc1b9086_0.tar.bz2
+https://conda.anaconda.org/conda-forge/noarch/recursivenodes-0.2.0-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-ppc64le/sympy-1.10.1-py39h0b1cf3c_0.tar.bz2
 https://conda.anaconda.org/conda-forge/noarch/codepy-2019.1-pyhd8ed1ab_0.tar.bz2
 https://conda.anaconda.org/conda-forge/linux-ppc64le/matplotlib-base-3.5.2-py39ha75218d_0.tar.bz2
