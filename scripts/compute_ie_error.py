@@ -540,8 +540,8 @@ def main(algorithm, fmm_order):
 
     # }}}
 
-    rel_err_2 = la.norm(err) / la.norm(test_direct)
-    rel_err_inf = la.norm(err, np.inf) / la.norm(test_direct, np.inf)
+    rel_err_2 = la.norm(err / test_direct)
+    rel_err_inf = la.norm(err / test_direct, np.inf)
 
     logger.info('rel_err_2: %.5e rel_err_inf: %.5e', rel_err_2, rel_err_inf)
 
@@ -552,6 +552,7 @@ def main(algorithm, fmm_order):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     fmm_orders = list(range(6, 20, 2))
     all_data = {'fmm_order': fmm_orders}
     for algorithm in ['compressed_fft', 'full', 'compressed']:
