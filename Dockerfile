@@ -20,3 +20,7 @@ COPY --chown=paper envs envs
 COPY --chown=paper install.sh install.sh
 RUN ./install.sh \
     && /home/paper/.miniforge/bin/conda clean --all --yes
+
+# Copy the scripts for running the experiments
+COPY --chown=paper scripts scripts
+COPY --chown=paper run.sh run.sh
