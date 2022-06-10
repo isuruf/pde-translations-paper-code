@@ -52,18 +52,18 @@ def main(kernel_name, dim):
         ref_bad_flops = orders**(expected[dim][op][0])
 
         if expected[dim][op][1] == 1:
-            ref_label = "$n"
+            ref_label = "$p"
         else:
-            ref_label = f"$n^{expected[dim][op][1]}"
+            ref_label = f"$p^{expected[dim][op][1]}"
         if expected[dim][op][0] == 1:
-            ref_bad_label = "$n"
+            ref_bad_label = "$p"
         else:
-            ref_bad_label = f"$n^{expected[dim][op][0]}"
+            ref_bad_label = f"$p^{expected[dim][op][0]}"
         if op == "m2l":
             ref_flops = ref_flops * np.log2(ref_flops)
             ref_bad_flops = ref_bad_flops * np.log2(ref_bad_flops)
-            ref_label += "\log(n)"
-            ref_bad_label += "\log(n)"
+            ref_label += "\log(p)"
+            ref_bad_label += "\log(p)"
         ref_label += "$"
         ref_bad_label += "$"
         ref_flops = ref_flops * compressed_flops[point]/ref_flops[point]
@@ -72,7 +72,7 @@ def main(kernel_name, dim):
         if expected[dim][op][0] != expected[dim][op][1]:
             plt.loglog(orders, ref_bad_flops, "--", color="red", label=ref_bad_label)
 
-        plt.xlabel("Order $n$", fontsize=15)
+        plt.xlabel("Order $p$", fontsize=15)
         plt.ylabel("FLOP Count", fontsize=15)
         ax=plt.gca()
         #ax.set_xticks(orders)
@@ -88,7 +88,7 @@ def main(kernel_name, dim):
         #     plt.ylim([2.5, 10**5])
 
         plt.legend(loc="best", prop={'size': 15})
-        plt.title(f"FLOP count {op.upper()} {kernel_disp_name} {dim}D", fontsize=15)
+        # plt.title(f"FLOP count {op.upper()} {kernel_disp_name} {dim}D", fontsize=15)
 
         plt.grid()
 
@@ -104,7 +104,8 @@ def main(kernel_name, dim):
                 if line.startswith("ytick={"):
                     f.write("xtick={"+ ",".join([str(xtick) for xtick in xticks]) + "},\n")
                     f.write("xticklabels={" + ",\n".join([f"\(\displaystyle {{ {xtick} }}\)" for xtick in xticks]) + "},\n")
-                f.write(line.replace('\\begin{tikzpicture}', '\\begin{tikzpicture}[scale=0.9]'))
+                if not line.startswith(("\\begin{tikzpicture}", "\\end{tikzpicture}")):
+                    f.write(line)
         plt.clf()
 
 
@@ -113,6 +114,3 @@ if __name__ == "__main__":
 
     main("LaplaceKernel", 2)
     main("LaplaceKernel", 3)
-    #main("HelmholtzKernel", 2)
-    #main("HelmholtzKernel", 3)
-    #main("StokesletKernel", 3)

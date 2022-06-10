@@ -48,7 +48,7 @@ def main(kernel_name, dim):
     kernel_id = kernel_disp_name.lower()
 
     plt.grid()
-    plt.title(f"M2M Accuracy {kernel_disp_name} {dim}D")
+    # plt.title(f"M2M Accuracy {kernel_disp_name} {dim}D")
 
     plt.xlabel("Source distribution radius $R$")
     if kernel_disp_name == "Laplace":
