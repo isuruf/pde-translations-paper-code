@@ -295,8 +295,7 @@ def make_source_and_target_points(
 
     from pytential.source import PointPotentialSource
     point_sources = make_circular_point_group(
-            ambient_dim, nsources, test_src_geo_radius,
-            func=lambda x: x**1.5)
+            ambient_dim, nsources, test_src_geo_radius)
     point_source = PointPotentialSource(
             actx.freeze(actx.from_numpy(point_sources)))
 
@@ -540,8 +539,8 @@ def main(algorithm, fmm_order):
 
     # }}}
 
-    rel_err_2 = la.norm(err / test_direct)
-    rel_err_inf = la.norm(err / test_direct, np.inf)
+    rel_err_2 = la.norm(err) / la.norm(test_direct)
+    rel_err_inf = la.norm(err, np.inf) / la.norm(test_direct, np.inf)
 
     logger.info('rel_err_2: %.5e rel_err_inf: %.5e', rel_err_2, rel_err_inf)
 

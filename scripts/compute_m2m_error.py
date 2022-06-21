@@ -50,7 +50,7 @@ def generate(knl):
     data = []
     for order in range(2, 13, 2):
         print(order)
-        h_values = 2.0**np.arange(-10, -5)
+        h_values = 2.0**np.arange(-10, -3)
         distances = []
         errs = []
         for h in h_values:
