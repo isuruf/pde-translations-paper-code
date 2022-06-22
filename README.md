@@ -4,10 +4,8 @@
 
 ### Run experiments
 
-    mkdir data
-    mkdir figures
-    docker run -it -v \
-        $PWD/figures:/home/paper/pde-translations-results/figures \
-        $PWD/data:/home/paper/pde-translations-results/data \
-        pde-translations-paper-code \
-        /bin/bash run.sh
+    container="pde-translations-$(date +%s)"
+    docker run -it --name $container pde-translations-paper-code /bin/bash run.sh
+
+    docker cp $container:/home/paper/pde-translations-results/data data
+    docker cp $container:/home/paper/pde-translations-results/figures figures
