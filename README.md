@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6638926.svg)](https://doi.org/10.5281/zenodo.6638926)
+
 ### Build Docker image
 
     docker build -f Dockerfile . -t pde-translations-paper-code
