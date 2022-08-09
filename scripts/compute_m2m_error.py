@@ -31,7 +31,6 @@ def generate(knl):
                           VolumeTaylorLocalExpansion]
 
     eval_center = np.array([0.1, 0.2, 0.3][:dim]).reshape(dim, 1)
-    mpole_center = np.array([0.0, 0.0, 0.0][:dim]).reshape(dim, 1)
 
     ntargets_per_dim = 50
     nsources_per_dim = 50
@@ -54,9 +53,12 @@ def generate(knl):
         distances = []
         errs = []
         for h in h_values:
+            mpole_center = np.array([h, h, h][:dim]).reshape(dim, 1)
             sources = (h*(-0.5+sources_grid.astype(np.float64)) + mpole_center)
             second_center = mpole_center - h
-            distances.append(np.max(np.abs(sources - mpole_center)))
+            r1 = np.max(np.linalg.norm(sources - mpole_center, axis=0))
+            r2 = r1 + np.linalg.norm(second_center - mpole_center)
+            distances.append(r2)
             m2m_vals = [0, 0]
             for i, (mpole_expn_class, local_expn_class) in \
                     enumerate(zip(mpole_expn_classes, local_expn_classes)):

@@ -50,7 +50,7 @@ def main(kernel_name, dim):
     plt.grid()
     # plt.title(f"M2M Accuracy {kernel_disp_name} {dim}D")
 
-    plt.xlabel("Source distribution radius $R$")
+    plt.xlabel("Translated multipole expansion radius $R_2$")
     if kernel_disp_name == "Laplace":
         plt.ylabel(r"$\epsilon_{rel}$")
 

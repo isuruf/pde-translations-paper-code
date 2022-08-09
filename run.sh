@@ -23,5 +23,8 @@ python ../scripts/compute_ie_error.py
 
 cd ..
 
+mkdir figures
+
 python scripts/plot_m2m_error.py
 python scripts/plot_flop_count.py
+python scripts/latex_table_ie_error.py

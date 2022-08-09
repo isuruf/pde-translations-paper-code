@@ -203,7 +203,8 @@ class IntegralEquationTestCase(RecordWithoutPickling):
                 return partial(res, m2l_translation=m2l_translation)
 
             def get_qbx_local_expansion_class(self, base_kernel):
-                return super().get_local_expansion_class(base_kernel)
+                return partial(super().get_local_expansion_class(base_kernel),
+                    m2l_translation=VolumeTaylorM2LTranslation())
 
         from pytential.qbx import QBXLayerPotentialSource
         return QBXLayerPotentialSource(

@@ -10,7 +10,7 @@ def main():
     fft = data["compressed_fft"]
 
     text = "  \\begin{tabular}{lcccc} \\toprule\n"
-    text += "    Order  & Taylor Series Error & Compressed Taylor Error & Compressed Taylor with FFT Error \\\\ \\midrule\n"
+    text += "    Order  & Taylor Series & Compressed Taylor & Compressed Taylor with FFT \\\\ \\midrule\n"
     for i, order in enumerate(orders):
         text += f"    {order} & {full[i]:.5e} & {comp[i]:.5e} & {fft[i]:.5e} \\\\\n"
     text = text[:-1]
