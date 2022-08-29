@@ -6,40 +6,32 @@ import tikzplotlib
 
 def main(kernel_name, dim):
     plt.clf()
-    with open(f"data/{kernel_name}_{dim}D_p2m2m2p_error.json", "r") as inf:
+    with open(f"data/{kernel_name}_{dim}D_p2m2m2p_error_no_assumption.json", "r") as inf:
         data = json.loads(inf.read())
 
     data = [dataset for dataset in data
             if (kernel_name != "StokesletKernel" or dataset["order"] != 10) and dataset["order"]<=14]
     orders = [dataset["order"] for dataset in data]
 
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
+            'tab:brown']
+
     for idataset, dataset in enumerate(data):
         h = np.array(dataset["r"])
-        error = np.array(dataset["error"])
         order = dataset["order"]
+        #if order < 12:
+        #    continue
+        error = np.array(dataset["error"])
+        error_uncompressed = np.array(dataset["error_uncompressed"])
+        error_compressed = np.array(dataset["error_compressed"])
 
         if kernel_name == "BiharmonicKernel" and order == 1:
             continue
 
-        kwargs = {}
-
-        kwargs["label"] = "$p=%d$" % order
-
-        plt.loglog(h, error, "o-", **kwargs)
-
-    for idataset, dataset in enumerate(data):
-        h = np.array(dataset["r"])
-        error = np.array(dataset["error"])
-        order = dataset["order"]
-
-        if order in [min(orders), max(orders)] and kernel_name == "HelmholtzKernel":
-            ref_point = -1
-            ref_h = np.linspace(h[0], h[-1])
-            ref_err = error[ref_point]*(ref_h/ref_h[ref_point])**(order+1)
-            color = "gray" if order == min(orders) else "red"
-            plt.loglog(ref_h, ref_err, "--", color=color, label="$R^{%d}$" % (order+1))
-            plt.ylim(bottom=1e-16)
-
+        plt.loglog(h, error, "o-", label=f"$\epsilon_{{rel}}$", color=colors[idataset])
+        plt.loglog(h, error_uncompressed, "x--",
+                label=f"$\epsilon_{{trunc}} (p={order})$", color=colors[idataset])
+    
     kernel_disp_name = kernel_name.replace("Kernel", "")
     kernel_disp_name = kernel_disp_name.replace("let", "")
     kernel_id = kernel_disp_name.lower()
@@ -48,13 +40,14 @@ def main(kernel_name, dim):
     # plt.title(f"M2M Accuracy {kernel_disp_name} {dim}D")
 
     plt.xlabel("Geometric parameter $R$")
-    if kernel_disp_name == "Laplace":
-        plt.ylabel(r"$\epsilon_{rel}$")
+    if dim == 2:
+        plt.ylabel(r"Error")
 
-    plt.legend(loc="best", prop={'size': 10})
+    plt.legend(loc="lower right", prop={'size': 6}, ncol=2)
     plt.tight_layout()
+    #plt.show()
 
-    tex_file_name = f"figures/accuracy-{kernel_id}-{dim}d.tex"
+    tex_file_name = f"figures/error-compare-{kernel_id}-{dim}d.tex"
     tikzplotlib.save(tex_file_name)
     import re
     with open(tex_file_name, "r") as f:
@@ -66,6 +59,8 @@ def main(kernel_name, dim):
                 skip=True
             if not skip and not (line.startswith('\\begin{tikzpicture}') or line.startswith("\\end{tikzpicture")):
                 f.write(line)
+            if line.startswith("legend style"):
+                f.write("nodes={scale=0.7, transform shape},\n")
             if line.startswith("},"):
                 skip=False
 
@@ -77,7 +72,7 @@ if __name__ == "__main__":
     #main("LaplaceKernel", 3)
     main("HelmholtzKernel", 2)
     main("HelmholtzKernel", 3)
-    main("BiharmonicKernel", 2)
-    main("BiharmonicKernel", 3)
+    #main("BiharmonicKernel", 2)
+    #main("BiharmonicKernel", 3)
     #main("StokesletKernel", 2)
     #main("StokesletKernel", 3)
