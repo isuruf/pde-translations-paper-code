@@ -49,9 +49,9 @@ def main(kernel_name, dim):
 
     plt.xlabel("Geometric parameter $R$")
     if kernel_disp_name == "Laplace":
-        plt.ylabel(r"$\epsilon_{rel}$")
+        plt.ylabel(r"$\epsilon_{\mathrm{rel}}$")
 
-    plt.legend(loc="best", prop={'size': 10})
+    plt.legend(loc="upper left", prop={'size': 10})
     plt.tight_layout()
 
     tex_file_name = f"figures/accuracy-{kernel_id}-{dim}d.tex"
@@ -65,6 +65,22 @@ def main(kernel_name, dim):
             if line.startswith("minor ytick"):
                 skip=True
             if not skip and not (line.startswith('\\begin{tikzpicture}') or line.startswith("\\end{tikzpicture")):
+                if kernel_disp_name == "Laplace":
+                    if dim == 2:
+                        points = ["2e-16", "5e-16"]
+                    else:
+                        points = ["1e-15", "2e-16"]
+                    if line.startswith("ytick="):
+                        f.write(f"ytick={{{points[0]},{points[1]}}},\n")
+                        continue
+                    if line.startswith("yticklabels="):
+                        f.write(line)
+                        f.write(f"\\(\\displaystyle {{{points[0]}}}\\),")
+                        f.write("\n")
+                        f.write(f"\\(\\displaystyle {{{points[1]}}}\\),")
+                        f.write("\n")
+                        continue
+
                 f.write(line)
             if line.startswith("},"):
                 skip=False
@@ -73,8 +89,8 @@ def main(kernel_name, dim):
 if __name__ == "__main__":
     #plt.rc("font", size=16)
 
-    #main("LaplaceKernel", 2)
-    #main("LaplaceKernel", 3)
+    main("LaplaceKernel", 2)
+    main("LaplaceKernel", 3)
     main("HelmholtzKernel", 2)
     main("HelmholtzKernel", 3)
     main("BiharmonicKernel", 2)

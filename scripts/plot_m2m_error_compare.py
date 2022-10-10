@@ -28,9 +28,9 @@ def main(kernel_name, dim):
         if kernel_name == "BiharmonicKernel" and order == 1:
             continue
 
-        plt.loglog(h, error, "o-", label=f"$\epsilon_{{rel}}$", color=colors[idataset])
+        plt.loglog(h, error, "o-", label=r"$\epsilon_{\mathrm{rel}}$", color=colors[idataset])
         plt.loglog(h, error_uncompressed, "x--",
-                label=f"$\epsilon_{{trunc}} (p={order})$", color=colors[idataset])
+                label=fr"$\epsilon_{{\mathrm{{trunc}}}} (p={order})$", color=colors[idataset])
     
     kernel_disp_name = kernel_name.replace("Kernel", "")
     kernel_disp_name = kernel_disp_name.replace("let", "")
@@ -45,7 +45,8 @@ def main(kernel_name, dim):
 
     plt.legend(loc="lower right", prop={'size': 6}, ncol=2)
     plt.tight_layout()
-    #plt.show()
+    #r = 1/(100*np.sqrt(dim))
+    #plt.axvline(x=r, color="black")
 
     tex_file_name = f"figures/error-compare-{kernel_id}-{dim}d.tex"
     tikzplotlib.save(tex_file_name)
