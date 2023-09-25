@@ -18,7 +18,8 @@ from sumpy.expansion.multipole import (
 from sumpy.expansion.local import (
         VolumeTaylorLocalExpansion,
         LinearPDEConformingVolumeTaylorLocalExpansion)
-from sumpy.expansion.m2l import NonFFTM2LTranslationClassFactory
+from sumpy.expansion.m2l import (NonFFTM2LTranslationClassFactory,
+        FFTM2LTranslationClassFactory)
 from sumpy.array_context import _acf
 from pytools.obj_array import make_obj_array
 from sumpy.visualization import FieldPlotter    
@@ -43,7 +44,7 @@ def generate(knl):
     actx = _acf()
     target_kernels = [knl]
     data = []
-    eval_offset = np.array([0.0, 0.0, 0.0, 5.5][-knl.dim:])
+    eval_offset = np.array([0.0, 0.0, 0.0, 9.5][-knl.dim:])
 
     origin = np.array([0, 0, 1, 2][-knl.dim:], np.float64)
     ntargets_per_dim = 4
@@ -52,7 +53,7 @@ def generate(knl):
     sources_grid = np.meshgrid(*[np.linspace(0, 1, nsources_per_dim)
                                  for _ in range(dim)])
     sources_grid = np.ndarray.flatten(np.array(sources_grid)).reshape(dim, -1)
-    sources = actx.from_numpy(0.7 * (-0.5 + sources_grid) + origin[:, np.newaxis])
+    sources = actx.from_numpy((-0.5 + sources_grid) + origin[:, np.newaxis])
     nsources = nsources_per_dim**dim
 
     strengths = actx.from_numpy(np.ones(nsources, dtype=np.float64) * (1/nsources))
@@ -60,7 +61,7 @@ def generate(knl):
     targets_grid = np.meshgrid(*[np.linspace(0, 1, ntargets_per_dim)
                                  for _ in range(dim)])
     targets_grid = np.ndarray.flatten(np.array(targets_grid)).reshape(dim, -1)
-    targets = eval_offset[:, np.newaxis] + 0.3*(targets_grid - 0.5)
+    targets = eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5)
     targets = actx.from_numpy(make_obj_array(list(targets)))
     ntargets = ntargets_per_dim**dim
 
@@ -70,10 +71,10 @@ def generate(knl):
                 [0, 0, 0, 0][-knl.dim:],
 
                 # box 1: second mpole here
-                np.array([0, 0, 0.1, -0.2][-knl.dim:], np.float64),
+                np.array([0.1, 0, 0, 0][:knl.dim], np.float64),
 
                 # box 2: first local here
-                eval_offset + np.array([0, 0, -0.2, 0.3][-knl.dim:], np.float64),
+                eval_offset + np.array([0, 0.1, 0.2, 0.5][-knl.dim:], np.float64),
 
                 # box 3: second local and eval here
                 eval_offset
@@ -82,7 +83,10 @@ def generate(knl):
 
     del eval_offset
 
-    orders = list(range(2, 13, 2))
+    if dim == 2:
+        orders = list(range(2, 25, 2))
+    else:
+        orders = list(range(2, 13, 2))
 
     nboxes = centers.shape[-1]
 
