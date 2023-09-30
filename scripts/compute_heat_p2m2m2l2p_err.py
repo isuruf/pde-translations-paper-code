@@ -34,6 +34,8 @@ def generate(knl):
 
     mpole_expn_class = LinearPDEConformingVolumeTaylorMultipoleExpansion
     local_expn_class = LinearPDEConformingVolumeTaylorLocalExpansion
+    #mpole_expn_class = VolumeTaylorMultipoleExpansion
+    #local_expn_class = VolumeTaylorLocalExpansion
     
     extra_kwargs = {}
     if isinstance(knl, HelmholtzKernel):
@@ -44,7 +46,6 @@ def generate(knl):
     actx = _acf()
     target_kernels = [knl]
     data = []
-    eval_offset = np.array([0.0, 0.0, 0.0, 9.5][-knl.dim:])
 
     origin = np.array([0, 0, 1, 2][-knl.dim:], np.float64)
     ntargets_per_dim = 4
@@ -53,7 +54,7 @@ def generate(knl):
     sources_grid = np.meshgrid(*[np.linspace(0, 1, nsources_per_dim)
                                  for _ in range(dim)])
     sources_grid = np.ndarray.flatten(np.array(sources_grid)).reshape(dim, -1)
-    sources = actx.from_numpy((-0.5 + sources_grid) + origin[:, np.newaxis])
+    #sources = actx.from_numpy((-0.5 + sources_grid) + origin[:, np.newaxis])
     nsources = nsources_per_dim**dim
 
     strengths = actx.from_numpy(np.ones(nsources, dtype=np.float64) * (1/nsources))
@@ -61,36 +62,18 @@ def generate(knl):
     targets_grid = np.meshgrid(*[np.linspace(0, 1, ntargets_per_dim)
                                  for _ in range(dim)])
     targets_grid = np.ndarray.flatten(np.array(targets_grid)).reshape(dim, -1)
-    targets = eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5)
-    targets = actx.from_numpy(make_obj_array(list(targets)))
+    #targets = eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5)
+    #targets = actx.from_numpy(make_obj_array(list(targets)))
     ntargets = ntargets_per_dim**dim
-
-    centers = actx.from_numpy((np.array(
-            [
-                # box 0: particles, first mpole here
-                [0, 0, 0, 0][-knl.dim:],
-
-                # box 1: second mpole here
-                np.array([0.1, 0, 0, 0][:knl.dim], np.float64),
-
-                # box 2: first local here
-                eval_offset + np.array([0, 0.1, 0.2, 0.5][-knl.dim:], np.float64),
-
-                # box 3: second local and eval here
-                eval_offset
-                ],
-            dtype=np.float64) + origin).T.copy())
-
-    del eval_offset
 
     if dim == 2:
         orders = list(range(2, 25, 2))
     else:
         orders = list(range(2, 13, 2))
 
-    nboxes = centers.shape[-1]
+    nboxes = 4
 
-    def eval_at(e2p, source_box_nr, rscale):
+    def eval_at(e2p, source_box_nr, rscale, centers):
         e2p_target_boxes = actx.from_numpy(
             np.array([source_box_nr], dtype=np.int32))
 
@@ -123,7 +106,31 @@ def generate(knl):
     m2l_factory = NonFFTM2LTranslationClassFactory()
     m2l_translation = m2l_factory.get_m2l_translation_class(knl, local_expn_class)()
 
-    for order in orders:
+    order = 6
+    #for order in orders:
+    for h in [1/2**i for i in range(15)]:
+        results = {"h": h, "order": order}
+        sources = actx.from_numpy(h*(-0.5 + sources_grid) + origin[:, np.newaxis])
+        eval_offset = np.array([0.0, 0.0, 0.0, 9.5][-knl.dim:])
+
+        targets = h * (eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5))
+        targets = actx.from_numpy(make_obj_array(list(targets)))
+        centers = actx.from_numpy((np.array(
+            [
+                # box 0: particles, first mpole here
+                [0, 0, 0, 0][-knl.dim:],
+
+                # box 1: second mpole here
+                np.array([-0.1*h, 0, 0, 0][:knl.dim], np.float64),
+
+                # box 2: first local here
+                h*(eval_offset + np.array([0, 0.1, 0.2, 0.5][-knl.dim:], np.float64)),
+
+                # box 3: second local and eval here
+                h*eval_offset
+                ],
+            dtype=np.float64) + origin).T.copy())
+
         m_expn = mpole_expn_class(knl, order=order)
         l_expn = local_expn_class(knl, order=order, m2l_translation=m2l_translation)
 
@@ -145,10 +152,11 @@ def generate(knl):
 
         # }}}
 
-        m1_rscale = 0.5
-        m2_rscale = 0.25
-        l1_rscale = 0.5
-        l2_rscale = 0.25
+        rscale_mult = h
+        m1_rscale = 0.5 * rscale_mult
+        m2_rscale = 0.25  * rscale_mult
+        l1_rscale = 0.5 * rscale_mult
+        l2_rscale = 0.25 * rscale_mult
 
         # {{{ apply P2M
 
@@ -175,7 +183,12 @@ def generate(knl):
 
         # }}}
 
-        # pot = eval_at(m2p, 0, m1_rscale)
+        pot_prev = pot_direct
+        pot = eval_at(m2p, 0, m1_rscale, centers)
+        err = la.norm(pot - pot_prev) / la.norm(pot_prev)
+        pot_prev = pot
+        results["p2m2p/p2p"] = err
+        #print(err)
 
         # {{{ apply M2M
 
@@ -201,7 +214,11 @@ def generate(knl):
 
         # }}}
 
-        # pot = eval_at(m2p, 1, m2_rscale)
+        pot = eval_at(m2p, 1, m2_rscale, centers)
+        err = la.norm(pot - pot_prev) / la.norm(pot_prev)
+        pot_prev = pot
+        results["p2m2m2p/p2m2p"] = err
+        #print(err)
 
         # {{{ apply M2L
 
@@ -226,7 +243,11 @@ def generate(knl):
 
         # }}}
 
-        # pot = eval_at(l2p, 2, l1_rscale)
+        pot = eval_at(l2p, 2, l1_rscale, centers)
+        err = la.norm(pot - pot_prev) / la.norm(pot_prev)
+        pot_prev = pot
+        results["p2m2m2l2p/p2m2m2p"] = err
+        #print(err)
 
         # {{{ apply L2L
 
@@ -251,12 +272,12 @@ def generate(knl):
 
         # }}}
 
-        pot = eval_at(l2p, 3, l2_rscale)
+        pot = eval_at(l2p, 3, l2_rscale, centers)
 
-        err = la.norm((pot - pot_direct) / ntargets)
-        err = err / (la.norm(pot_direct) / ntargets)
-        data.append({"order": order, "error": err})
-        print(data)
+        err = la.norm(pot - pot_direct) / la.norm(pot_direct)
+        results["p2m2m2l2l2p/p2p"] = err
+        data.append(results)
+        print(results)
         
         name = type(knl).__name__
         with open(f'{name}_{dim - 1}D_p2m2m2l2lp_error.json', 'w') as f:
