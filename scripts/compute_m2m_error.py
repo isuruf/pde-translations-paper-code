@@ -7,7 +7,7 @@ import pyopencl as cl
 import sumpy.toys as t
 import numpy as np
 from sumpy.kernel import (HelmholtzKernel, LaplaceKernel,  # noqa: F401
-                          BiharmonicKernel)
+                          BiharmonicKernel, HeatKernel)
 import sys
 
 from sumpy.expansion.multipole import (
@@ -25,6 +25,8 @@ def generate(knl, assumption=True):
             extra_kernel_kwargs = {'k': 1}
         else:
             extra_kernel_kwargs = {'k': 50}
+    if isinstance(knl, HeatKernel):
+        extra_kernel_kwargs = {'alpha': 0.1}
 
     dim = knl.dim
 
@@ -33,7 +35,7 @@ def generate(knl, assumption=True):
     local_expn_classes = [LinearPDEConformingVolumeTaylorLocalExpansion,
                           VolumeTaylorLocalExpansion]
 
-    eval_center = np.array([1, 1, 1][:dim]).reshape(dim, 1)
+    eval_center = np.array([1]*dim).reshape(dim, 1)
 
     ntargets_per_dim = 50
     nsources_per_dim = 50
@@ -78,9 +80,10 @@ def generate(knl, assumption=True):
             'error_uncompressed': errs_uncompressed,
             'error_compressed': errs_compressed,
             'k': extra_kernel_kwargs.get('k', 0),
+            'alpha': extra_kernel_kwargs.get('alpha', 0),
         })
         for ih, h in enumerate(h_values):
-            mpole_center = np.array([h, h, h][:dim]).reshape(dim, 1)
+            mpole_center = np.array([h]*dim).reshape(dim, 1)
             sources = (2*h*(-0.5+sources_grid.astype(np.float64)) + mpole_center)
             second_center = mpole_center - h
             r1 = np.max(np.linalg.norm(sources - mpole_center, axis=0))
