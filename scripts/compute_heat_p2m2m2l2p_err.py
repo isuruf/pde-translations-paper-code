@@ -34,8 +34,8 @@ def generate(knl):
 
     mpole_expn_class = LinearPDEConformingVolumeTaylorMultipoleExpansion
     local_expn_class = LinearPDEConformingVolumeTaylorLocalExpansion
-    #mpole_expn_class = VolumeTaylorMultipoleExpansion
-    #local_expn_class = VolumeTaylorLocalExpansion
+    mpole_expn_class = VolumeTaylorMultipoleExpansion
+    local_expn_class = VolumeTaylorLocalExpansion
     
     extra_kwargs = {}
     if isinstance(knl, HelmholtzKernel):
@@ -108,12 +108,12 @@ def generate(knl):
 
     order = 6
     #for order in orders:
-    for h in [1/2**i for i in range(15)]:
+    for h in [1/2**i for i in range(10)]:
         results = {"h": h, "order": order}
-        sources = actx.from_numpy(h*(-0.5 + sources_grid) + origin[:, np.newaxis])
+        sources = actx.from_numpy(h * (-0.5 + sources_grid) + origin[:, np.newaxis])
         eval_offset = np.array([0.0, 0.0, 0.0, 9.5][-knl.dim:])
-
-        targets = h * (eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5))
+    
+        targets = h*(eval_offset[:, np.newaxis] + 0.25 * (targets_grid - 0.5))
         targets = actx.from_numpy(make_obj_array(list(targets)))
         centers = actx.from_numpy((np.array(
             [
@@ -122,14 +122,17 @@ def generate(knl):
 
                 # box 1: second mpole here
                 np.array([-0.1*h, 0, 0, 0][:knl.dim], np.float64),
-
+                
                 # box 2: first local here
                 h*(eval_offset + np.array([0, 0.1, 0.2, 0.5][-knl.dim:], np.float64)),
 
                 # box 3: second local and eval here
-                h*eval_offset
+                h*eval_offset,
+
                 ],
             dtype=np.float64) + origin).T.copy())
+        
+        extra_kwargs["alpha"] = 0.001
 
         m_expn = mpole_expn_class(knl, order=order)
         l_expn = local_expn_class(knl, order=order, m2l_translation=m2l_translation)
