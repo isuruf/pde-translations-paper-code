@@ -120,18 +120,26 @@ def generate(knl):
 
         return pot
 
-    m2l_factory = NonFFTM2LTranslationClassFactory()
+    m2l_factory = FFTM2LTranslationClassFactory()
     m2l_translation = m2l_factory.get_m2l_translation_class(knl, local_expn_class)()
+    print(m2l_translation)
 
     for order in orders:
         m_expn = mpole_expn_class(knl, order=order)
         l_expn = local_expn_class(knl, order=order, m2l_translation=m2l_translation)
 
-        from sumpy import P2EFromSingleBox, E2PFromSingleBox, P2P, E2EFromCSR
+        from sumpy import (P2EFromSingleBox, E2PFromSingleBox, P2P, E2EFromCSR,
+            M2LUsingTranslationClassesDependentData,
+            M2LGenerateTranslationClassesDependentData,
+            M2LPreprocessMultipole, M2LPostprocessLocal)
+
         p2m = P2EFromSingleBox(actx.context, m_expn)
         m2m = E2EFromCSR(actx.context, m_expn, m_expn)
         m2p = E2PFromSingleBox(actx.context, m_expn, target_kernels)
-        m2l = E2EFromCSR(actx.context, m_expn, l_expn)
+        m2l_data = M2LGenerateTranslationClassesDependentData(actx.context, m_expn, l_expn)
+        m2l_pre = M2LPreprocessMultipole(actx.context, m_expn, l_expn)
+        m2l = M2LUsingTranslationClassesDependentData(actx.context, m_expn, l_expn)
+        m2l_post = M2LPostprocessLocal(actx.context, m_expn, l_expn)
         l2l = E2EFromCSR(actx.context, l_expn, l_expn)
         l2p = E2PFromSingleBox(actx.context, l_expn, target_kernels)
         p2p = P2P(actx.context, target_kernels, exclude_self=False)
@@ -171,11 +179,14 @@ def generate(knl):
                 rscale=m1_rscale,
 
                 tgt_base_ibox=0,
+                wait_for=[evt],
                 **extra_kwargs)
 
         # }}}
 
-        # pot = eval_at(m2p, 0, m1_rscale)
+        pot = eval_at(m2p, 0, m1_rscale)
+        err = la.norm(pot - pot_direct) / la.norm(pot_direct)
+        print(err)
 
         # {{{ apply M2M
 
@@ -197,23 +208,72 @@ def generate(knl):
 
                 src_rscale=m1_rscale,
                 tgt_rscale=m2_rscale,
+                wait_for=[evt],
                 **extra_kwargs)
 
         # }}}
 
-        # pot = eval_at(m2p, 1, m2_rscale)
+        pot = eval_at(m2p, 1, m2_rscale)
+        err = la.norm(pot - pot_direct) / la.norm(pot_direct)
+        print(err)
 
         # {{{ apply M2L
-
-        m2l_target_boxes = actx.from_numpy(np.array([2], dtype=np.int32))
+        
+        print(actx.to_numpy(mpoles[1:2, :]))
+        m2l_target_boxes = actx.from_numpy(np.array([0], dtype=np.int32))
         m2l_src_box_starts = actx.from_numpy(np.array([0, 1], dtype=np.int32))
-        m2l_src_box_lists = actx.from_numpy(np.array([1], dtype=np.int32))
+        m2l_src_box_lists = actx.from_numpy(np.array([0], dtype=np.int32))
 
-        evt, (mpoles,) = m2l(actx.queue,
-                src_expansions=mpoles,
+        len_fft = m2l_translation.preprocess_multipole_nexprs(l_expn, m_expn)
+        m2l_preprocess = actx.zeros((1, len_fft), dtype=np.complex128)
+
+        # Preprocess the mpole expansion at box 1
+        evt, _ = m2l_pre(actx.queue,
+                src_expansions=mpoles[1:2, :],
+                preprocessed_src_expansions=m2l_preprocess,
+                src_rscale=np.float64(m2_rscale),
+                wait_for=[evt],
+                **extra_kwargs)
+
+        from sumpy.tools import run_opencl_fft, get_opencl_fft_app, get_native_event
+        fft_app = get_opencl_fft_app(actx.queue, (len_fft,),
+            dtype=m2l_preprocess.dtype, inverse=False)
+        ifft_app = get_opencl_fft_app(actx.queue, (len_fft,),
+            dtype=m2l_preprocess.dtype, inverse=True)
+
+        evt, m2l_preprocess = run_opencl_fft(fft_app, actx.queue,
+                m2l_preprocess, inverse=False, wait_for=[evt])
+
+        m2l_translation_classes_lists = actx.from_numpy(np.array([0], dtype=np.int32))
+        centers_np = actx.to_numpy(centers)
+        dist = centers_np[:, 2] - centers_np[:, 1]
+        m2l_translation_vectors = actx.from_numpy(dist.reshape(dim, 1))
+        m2l_translation_classes_dependent_data = actx.zeros(
+                (1, len_fft), dtype=np.complex128)
+
+        # translation classes data
+        evt, _ = m2l_data(
+                actx.queue,
+                src_rscale=m2_rscale,
+                ntranslation_classes=1,
+                translation_classes_level_start=0,
+                m2l_translation_classes_dependent_data=(
+                    m2l_translation_classes_dependent_data),
+                m2l_translation_vectors=m2l_translation_vectors,
+                ntranslation_vectors=1,
+                wait_for=[get_native_event(evt)],
+                **extra_kwargs)
+
+        evt, m2l_translation_classes_dependent_data = run_opencl_fft(fft_app, actx.queue,
+                m2l_translation_classes_dependent_data, inverse=False, wait_for=[evt])
+
+        print(m2l_preprocess.shape, mpoles.shape)
+        # translate part
+        evt, (local_before,) = m2l(actx.queue,
+                src_expansions=m2l_preprocess,
                 src_base_ibox=0,
                 tgt_base_ibox=0,
-                ntgt_level_boxes=mpoles.shape[0],
+                ntgt_level_boxes=1,
 
                 target_boxes=m2l_target_boxes,
                 src_box_starts=m2l_src_box_starts,
@@ -222,11 +282,32 @@ def generate(knl):
 
                 src_rscale=m2_rscale,
                 tgt_rscale=l1_rscale,
+                m2l_translation_classes_dependent_data=(
+                    m2l_translation_classes_dependent_data),
+                m2l_translation_classes_lists=m2l_translation_classes_lists,
+                translation_classes_level_start=0,
+                wait_for=[get_native_event(evt)],
                 **extra_kwargs)
+        
+        print(local_before.shape)
 
+        # iFFT
+        evt, local_before = run_opencl_fft(ifft_app, actx.queue,
+            local_before, inverse=True, wait_for=[evt])
+
+        # Postprocess the local expansion
+        evt, _ = m2l_post(queue=actx.queue,
+                tgt_expansions_before_postprocessing=local_before,
+                tgt_expansions=mpoles[2:3, :],
+                src_rscale=np.float64(m2_rscale),
+                tgt_rscale=np.float64(l1_rscale),
+                wait_for=[get_native_event(evt)],
+                **extra_kwargs)
         # }}}
 
-        # pot = eval_at(l2p, 2, l1_rscale)
+        pot = eval_at(l2p, 2, l1_rscale)
+        err = la.norm(pot - pot_direct) / la.norm(pot_direct)
+        print(err)
 
         # {{{ apply L2L
 
@@ -252,9 +333,7 @@ def generate(knl):
         # }}}
 
         pot = eval_at(l2p, 3, l2_rscale)
-
-        err = la.norm((pot - pot_direct) / ntargets)
-        err = err / (la.norm(pot_direct) / ntargets)
+        err = la.norm(pot - pot_direct) / la.norm(pot_direct)
         data.append({"order": order, "error": err})
         print(data)
         
