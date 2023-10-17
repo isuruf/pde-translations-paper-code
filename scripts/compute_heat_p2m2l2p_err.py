@@ -37,14 +37,14 @@ def generate(knl):
     if isinstance(knl, HelmholtzKernel):
         extra_kwargs["k"] = 0.05
     if isinstance(knl, HeatKernel):
-        extra_kwargs["alpha"] = 1
+        extra_kwargs["alpha"] = 0.1
 
     actx = _acf()
     target_kernels = [knl]
     data = []
 
     origin = np.array([0, 0, 0, 0][-knl.dim:], np.float64)
-    ntargets_per_dim = 3
+    ntargets_per_dim = 1
     nsources_per_dim = 10
 
     sources_grid = np.meshgrid(*[np.linspace(0, 1, nsources_per_dim)
@@ -64,7 +64,7 @@ def generate(knl):
         actx.context,
         kernel=knl,
         extra_kernel_kwargs=extra_kwargs,
-        m2l_use_fft=False,
+        m2l_use_fft=True,
     )
 
 
@@ -76,18 +76,21 @@ def generate(knl):
     def norm(x):
         return np.max(np.abs(x))
 
-    for h in 2.0**np.arange(-2, -12, -1):
+    for h in 2.0**np.arange(-2, -10, -1):
         src_size = 1
         sources = src_size * sources_grid + origin[:, np.newaxis]
         p = t.PointSources(toy_ctx, sources, weights=strengths)
+        mpole_center = origin + np.array([0, 0, 0, 0.0][-knl.dim:])
         local_center = origin + np.array([0, 0, 0, 0.5][-knl.dim:])
         targets = local_center[:, np.newaxis] + h*(targets_grid - 0.5)
 
         p2p = p.eval(targets)
-        p2l = t.local_expand(p, local_center, order, l1_rscale)
-        p2l2p = p2l.eval(targets)
-        err = norm((p2l2p - p2p)/p2p)
-        
+        p2m = t.multipole_expand(p, mpole_center, order, m1_rscale)
+        p2m2l = t.local_expand(p2m, local_center, order, l1_rscale)
+        p2m2l2p = p2m2l.eval(targets)
+        p2m2p = p2m.eval(targets)
+        err = norm((p2m2l2p - p2m2p)/p2m2p)
+
         dist = targets - local_center[:, np.newaxis]
         conv_factor = np.linalg.norm(dist)
         error_model = conv_factor**(order+1)
@@ -96,7 +99,7 @@ def generate(knl):
         data.append({"h": norm(conv_factor), "order": order, "error": err, "ratio": ratio})
         print(data[-1])
         name = type(knl).__name__
-        with open(f'{name}_{dim - 1}D_p2l2p_error.json', 'w') as f:
+        with open(f'{name}_{dim - 1}D_p2m2l2p_error.json', 'w') as f:
             json.dump(data, f, indent=2)
 
     print(data)
@@ -109,7 +112,7 @@ def generate(knl):
         plt.loglog(x, np.array(x)**(order + 1)*y[0]/x[0]**(order + 1), label="error_model")
         plt.xlabel("convergence factor")
         plt.ylabel("error")
-        plt.title("P2L2P error for Heat 1D")
+        plt.title("P2M2L2P error for Heat 1D")
         plt.legend()
         plt.show()
 
