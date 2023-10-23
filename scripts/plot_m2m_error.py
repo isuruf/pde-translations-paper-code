@@ -89,11 +89,12 @@ def main(kernel_name, dim):
 if __name__ == "__main__":
     #plt.rc("font", size=16)
 
-    main("LaplaceKernel", 2)
-    main("LaplaceKernel", 3)
-    main("HelmholtzKernel", 2)
-    main("HelmholtzKernel", 3)
-    main("BiharmonicKernel", 2)
-    main("BiharmonicKernel", 3)
+    main("HeatKernel", 2)
+    main("HeatKernel", 3)
+    main("HeatKernel", 4)
+    #main("HelmholtzKernel", 2)
+    #main("HelmholtzKernel", 3)
+    #main("BiharmonicKernel", 2)
+    #main("BiharmonicKernel", 3)
     #main("StokesletKernel", 2)
     #main("StokesletKernel", 3)
