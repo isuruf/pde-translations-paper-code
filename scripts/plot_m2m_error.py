@@ -89,9 +89,9 @@ def main(kernel_name, dim):
 if __name__ == "__main__":
     #plt.rc("font", size=16)
 
+    main("HeatKernel", 1)
     main("HeatKernel", 2)
     main("HeatKernel", 3)
-    main("HeatKernel", 4)
     #main("HelmholtzKernel", 2)
     #main("HelmholtzKernel", 3)
     #main("BiharmonicKernel", 2)

@@ -141,6 +141,7 @@ def generate(knl, assumption=True):
 
         import json
         name = type(knl).__name__
+        spatial_dim = dim - 1 if name == "HeatKernel" else dim
         if assumption:
             fname = f'{name}_{dim}D_p2m2m2p_error.json'
         else:
