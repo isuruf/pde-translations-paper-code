@@ -32,7 +32,7 @@ def main(kernel_name, dim):
         error = np.array(dataset["error"])
         order = dataset["order"]
 
-        if order in [min(orders), max(orders)] and kernel_name == "HelmholtzKernel":
+        if order in [min(orders), max(orders)] and kernel_name in ("HelmholtzKernel", "HeatKernel"):
             ref_point = -1
             ref_h = np.linspace(h[0], h[-1])
             ref_err = error[ref_point]*(ref_h/ref_h[ref_point])**(order+1)
