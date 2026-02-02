@@ -86,7 +86,7 @@ def generate(knl):
             m_expn = mpole_expn_class(knl, order=order)
             l_expn = local_expn_class(
                 kernel=knl, order=order,
-                m2l_translation=m2l_translation)
+                m2l_translation_override=m2l_translation)
 
             src_coeff_exprs = [
                 sym.Symbol(f'src_coeff{i}') for i in range(len(m_expn))]

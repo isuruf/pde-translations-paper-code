@@ -1,0 +1,196 @@
+% This file was created with tikzplotlib v0.10.1.
+
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple148103189}{RGB}{148,103,189}
+\definecolor{sienna1408675}{RGB}{140,86,75}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend columns=2,
+legend style={
+nodes={scale=0.7, transform shape},
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgray204
+},
+log basis x={10},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={Geometric parameter \(\displaystyle R\)},
+xmajorgrids,
+xmin=0.000793215230816636, xmax=0.0769465258340573,
+xmode=log,
+xtick style={color=black},
+xtick={1e-05,0.0001,0.001,0.01,0.1,1},
+xticklabels={
+  \(\displaystyle {10^{-5}}\),
+  \(\displaystyle {10^{-4}}\),
+  \(\displaystyle {10^{-3}}\),
+  \(\displaystyle {10^{-2}}\),
+  \(\displaystyle {10^{-1}}\),
+  \(\displaystyle {10^{0}}\)
+},
+y grid style={darkgray176},
+ylabel={Error},
+ymajorgrids,
+ymin=2.54649866451107e-16, ymax=2666.1107575101,
+ymode=log,
+ytick style={color=black},
+ytick={1e-19,1e-16,1e-13,1e-10,1e-07,0.0001,0.1,100,100000,100000000},
+yticklabels={
+  \(\displaystyle {10^{-19}}\),
+  \(\displaystyle {10^{-16}}\),
+  \(\displaystyle {10^{-13}}\),
+  \(\displaystyle {10^{-10}}\),
+  \(\displaystyle {10^{-7}}\),
+  \(\displaystyle {10^{-4}}\),
+  \(\displaystyle {10^{-1}}\),
+  \(\displaystyle {10^{2}}\),
+  \(\displaystyle {10^{5}}\),
+  \(\displaystyle {10^{8}}\)
+}
+]
+\addplot [semithick, steelblue31119180, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 2.84763336510232e-05
+0.001953125 0.00022840642339751
+0.00390625 0.00184610646083004
+0.0078125 0.015225623443447
+0.015625 0.116910954563411
+0.03125 0.489562362071205
+0.0625 1.62063541184585
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, steelblue31119180, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 7.98702965713943e-05
+0.001953125 0.000639117189184384
+0.00390625 0.00512226364306474
+0.0078125 0.0413511298164763
+0.015625 0.344620704607524
+0.03125 3.34541433981007
+0.0625 120.045407449702
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=2)$}
+\addplot [semithick, darkorange25512714, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 2.77220252192455e-08
+0.001953125 8.88128242538621e-07
+0.00390625 2.85758233478698e-05
+0.0078125 0.000936607537223252
+0.015625 0.0340421951383755
+0.03125 2.0289889639416
+0.0625 1.15835022491601
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, darkorange25512714, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 3.7738214236905e-08
+0.001953125 1.20816993880535e-06
+0.00390625 3.87661916384758e-05
+0.0078125 0.00125634052098048
+0.015625 0.0424945010733047
+0.03125 1.74617351886709
+0.0625 297.89444791291
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=4)$}
+\addplot [semithick, forestgreen4416044, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 9.81655876690765e-12
+0.001953125 1.2574694651041e-09
+0.00390625 1.61601949192257e-07
+0.0078125 2.10571365000038e-05
+0.015625 0.00289976921194171
+0.03125 0.345648223894007
+0.0625 1.08257300575585
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, forestgreen4416044, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 9.95998602894611e-12
+0.001953125 1.27551965941629e-09
+0.00390625 1.63778747291006e-07
+0.0078125 2.12685012995909e-05
+0.015625 0.00289802016666934
+0.03125 0.489528920822369
+0.0625 364.196442535444
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=6)$}
+\addplot [semithick, crimson2143940, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 3.01468191373322e-15
+0.001953125 9.51486230960445e-13
+0.00390625 4.89084864826757e-10
+0.0078125 2.54504840657937e-07
+0.015625 0.000139678505253709
+0.03125 0.105248300832229
+0.0625 1.10004838776848
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, crimson2143940, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 5.61526032212369e-15
+0.001953125 8.69703532167309e-13
+0.00390625 4.47109699692849e-10
+0.0078125 2.32478384264736e-07
+0.015625 0.000127216815884921
+0.03125 0.087300095152783
+0.0625 273.423787655031
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=8)$}
+\addplot [semithick, mediumpurple148103189, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 2.54361225348086e-15
+0.001953125 1.99407904423273e-15
+0.00390625 9.43338513262353e-13
+0.0078125 1.96014722458169e-09
+0.015625 4.29703583625743e-06
+0.03125 0.0117327553311502
+0.0625 1.06489716688157
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, mediumpurple148103189, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 5.51558867432623e-15
+0.001953125 5.53112349659443e-15
+0.00390625 8.59244984008696e-13
+0.0078125 1.78636596507524e-09
+0.015625 3.91987822884606e-06
+0.03125 0.0108648908521263
+0.0625 140.707009399753
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=10)$}
+\addplot [semithick, sienna1408675, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 2.548724768093e-15
+0.001953125 1.86417182885507e-15
+0.00390625 4.55462578878898e-15
+0.0078125 1.07745839426813e-11
+0.015625 9.4567051286009e-08
+0.03125 0.00104836313602131
+0.0625 1.00301290199418
+};
+\addlegendentry{$\epsilon_{\mathrm{rel}}$}
+\addplot [semithick, sienna1408675, dash pattern=on 5.55pt off 2.4pt, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 5.51437765220643e-15
+0.001953125 5.46359043896083e-15
+0.00390625 5.28963412326351e-15
+0.0078125 1.02045061960949e-11
+0.015625 8.97294445510143e-08
+0.03125 0.00100134435210236
+0.0625 53.0730374617182
+};
+\addlegendentry{$\epsilon_{\mathrm{trunc}} (p=12)$}
+\end{axis}
+

@@ -1,0 +1,151 @@
+% This file was created with tikzplotlib v0.10.1.
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{gray}{RGB}{128,128,128}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=lightgray204
+},
+log basis x={10},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={Order \(\displaystyle p\)},
+xmajorgrids,
+xmin=1.72620478295848, xmax=44.0272213067016,
+xmode=log,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={FLOP Count},
+ymajorgrids,
+ymin=5.31479290989162, ymax=2249065.95310329,
+ymode=log,
+ytick style={color=black},
+xtick={2,4,6,8,10,20,30,40},
+xticklabels={\(\displaystyle { 2 }\),
+\(\displaystyle { 4 }\),
+\(\displaystyle { 6 }\),
+\(\displaystyle { 8 }\),
+\(\displaystyle { 10 }\),
+\(\displaystyle { 20 }\),
+\(\displaystyle { 30 }\),
+\(\displaystyle { 40 }\)},
+ytick={0.1,1,10,100,1000,10000,100000,1000000,10000000,100000000},
+yticklabels={
+  \(\displaystyle {10^{-1}}\),
+  \(\displaystyle {10^{0}}\),
+  \(\displaystyle {10^{1}}\),
+  \(\displaystyle {10^{2}}\),
+  \(\displaystyle {10^{3}}\),
+  \(\displaystyle {10^{4}}\),
+  \(\displaystyle {10^{5}}\),
+  \(\displaystyle {10^{6}}\),
+  \(\displaystyle {10^{7}}\),
+  \(\displaystyle {10^{8}}\)
+}
+]
+\addplot [semithick, steelblue31119180, mark=*, mark size=3, mark options={solid}]
+table {%
+2 108
+4 595
+6 1882
+8 4621
+10 9652
+12 18007
+14 30910
+16 49777
+18 76216
+20 112027
+22 159202
+24 219925
+26 296572
+28 391711
+30 508102
+32 648697
+34 816640
+36 1015267
+38 1248106
+};
+\addlegendentry{M2M Full}
+\addplot [semithick, darkorange25512714, mark=*, mark size=3, mark options={solid}]
+table {%
+2 106
+4 511
+6 1414
+8 3037
+10 5596
+12 9307
+14 14386
+16 21049
+18 29512
+20 39991
+22 52702
+24 67861
+26 85684
+28 106387
+30 130186
+32 157297
+34 187936
+36 222319
+38 260662
+};
+\addlegendentry{M2M Compressed}
+\addplot [semithick, gray, dash pattern=on 5.55pt off 2.4pt]
+table {%
+2 38.00291587695
+4 304.0233270156
+6 1026.07872867765
+8 2432.1866161248
+10 4750.36448461875
+12 8208.6298294212
+14 13035.0001457938
+16 19457.4929289984
+18 27704.1256742965
+20 38002.91587695
+22 50581.8810322204
+24 65669.0386353696
+26 83492.4061816591
+28 104280.001166351
+30 128259.841084706
+32 155659.943431987
+34 186708.325703455
+36 221633.005394372
+38 260662
+};
+\addlegendentry{$p^3$}
+\addplot [semithick, red, dash pattern=on 5.55pt off 2.4pt]
+table {%
+2 9.57716714880948
+4 153.234674380952
+6 775.750539053568
+8 2451.75479009523
+10 5985.72946800592
+12 12412.0086248571
+14 22994.7783242916
+16 39228.0766415236
+18 62835.793663339
+20 95771.6714880948
+22 140219.30422572
+24 198592.137997713
+26 273533.470937148
+28 367916.453188665
+30 484844.08690848
+32 627649.226264378
+34 799894.577435716
+36 1005372.69861342
+38 1248106
+};
+\addlegendentry{$p^4$}
+\end{axis}
+

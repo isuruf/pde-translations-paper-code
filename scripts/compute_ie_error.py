@@ -9,14 +9,14 @@ from pyopencl.tools import (  # noqa
 from functools import partial
 from meshmode.mesh.generation import ellipse, make_curve_mesh
 from meshmode.discretization.visualization import make_visualizer
-from meshmode.dof_array import flatten_to_numpy
-import meshmode
+from arraycontext import flatten
+from pytential.array_context import _acf
 from sumpy.kernel import LaplaceKernel, HelmholtzKernel, BiharmonicKernel
 
 from pytential import bind, sym
 from pytential import GeometryCollection
-from pytools.obj_array import flat_obj_array
-from pytential.qbx import QBXTargetAssociationFailedException
+from pytools.obj_array import flat
+from pytential.qbx import QBXTargetAssociationFailedError
 
 import json
 import logging
@@ -200,11 +200,11 @@ class IntegralEquationTestCase(RecordWithoutPickling):
         class ExpansionFactory(factory_parent_class):
             def get_local_expansion_class(self, base_kernel):
                 res = super().get_local_expansion_class(base_kernel)
-                return partial(res, m2l_translation=m2l_translation)
+                return partial(res, m2l_translation_override=m2l_translation)
 
             def get_qbx_local_expansion_class(self, base_kernel):
                 return partial(super().get_local_expansion_class(base_kernel),
-                    m2l_translation=VolumeTaylorM2LTranslation())
+                    m2l_translation_override=VolumeTaylorM2LTranslation())
 
         from pytential.qbx import QBXLayerPotentialSource
         return QBXLayerPotentialSource(
@@ -312,9 +312,8 @@ def make_source_and_target_points(
 
 
 def main(algorithm, fmm_order):
-    ctx_factory = meshmode._acf
     visualize = True
-    actx = ctx_factory()
+    actx = _acf()
     qbx_order = 5
     resolution = 100
 
@@ -480,7 +479,7 @@ def main(algorithm, fmm_order):
             auto_where=('point_source', case.name))(
                 actx, charges=source_charges_dev, **case.knl_concrete_kwargs)
 
-        bc = flat_obj_array(bc_u, bc_du)
+        bc = flat(bc_u, bc_du)
     else:
         raise ValueError(f'unknown bc_type: "{case.bc_type}"')
 
@@ -501,7 +500,7 @@ def main(algorithm, fmm_order):
             hard_failure=True,
             stall_iterations=100, no_progress_factor=1.05,
             require_monotonicity=False)
-    except QBXTargetAssociationFailedException as e:
+    except QBXTargetAssociationFailedError as e:
         bdry_vis = make_visualizer(actx, density_discr, case.target_order + 3)
 
         bdry_vis.write_vtk_file(f'failed-targets-solve-{resolution}.vtu', [
@@ -524,9 +523,9 @@ def main(algorithm, fmm_order):
 
     err = test_via_bdry - test_direct
 
-    err = flatten_to_numpy(actx, err, strict=False)
-    test_direct = flatten_to_numpy(actx, test_direct, strict=False)
-    test_via_bdry = flatten_to_numpy(actx, test_via_bdry, strict=False)
+    err = actx.to_numpy(flatten(err, actx))
+    test_direct = actx.to_numpy(flatten(test_direct, actx))
+    test_via_bdry = actx.to_numpy(flatten(test_via_bdry, actx))
 
     # {{{ remove effect of net source charge
 
@@ -547,8 +546,8 @@ def main(algorithm, fmm_order):
 
     # }}}
 
-    print(rel_err_inf)
-    return rel_err_inf
+    print(rel_err_2)
+    return rel_err_2
 
 
 if __name__ == '__main__':
@@ -559,7 +558,7 @@ if __name__ == '__main__':
         data = []
         all_data[algorithm] = data
         for fmm_order in fmm_orders:
-            rel_err_inf = main(algorithm, fmm_order)
-            data.append(rel_err_inf)
+            rel_err_2 = main(algorithm, fmm_order)
+            data.append(rel_err_2)
             with open('Biharmonic_IE_error.json', 'w') as f:
                 json.dump(all_data, f)

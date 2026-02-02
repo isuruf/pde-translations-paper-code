@@ -5,6 +5,14 @@ import numpy as np
 import json
 
 
+def fix_tikz_legend(obj):
+    """Workaround for matplotlib 3.6+ renamed legend's _ncol to _ncols"""
+    if hasattr(obj, "_ncols"):
+        obj._ncol = obj._ncols
+    for child in obj.get_children():
+        fix_tikz_legend(child)
+
+
 expected = {
   3: {
     "p2m": (3, 3),
@@ -93,7 +101,7 @@ def main(kernel_name, dim):
         plt.grid()
 
         plt.tight_layout()
-        #plt.savefig(f"figures/flops-{kernel_id}-{op.upper()}-{dim}d.pdf")
+        fix_tikz_legend(plt.gcf())
         tex_file_name = f"figures/flops-{kernel_id}-{op.upper()}-{dim}d.tex"
         tikzplotlib.save(tex_file_name)
         import re

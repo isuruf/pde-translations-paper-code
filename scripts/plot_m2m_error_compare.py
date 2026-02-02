@@ -4,6 +4,14 @@ import json
 import tikzplotlib
 
 
+def fix_tikz_legend(obj):
+    """Workaround for matplotlib 3.6+ renamed legend's _ncol to _ncols"""
+    if hasattr(obj, "_ncols"):
+        obj._ncol = obj._ncols
+    for child in obj.get_children():
+        fix_tikz_legend(child)
+
+
 def main(kernel_name, dim):
     plt.clf()
     with open(f"data/{kernel_name}_{dim}D_p2m2m2p_error_no_assumption.json", "r") as inf:
@@ -31,7 +39,7 @@ def main(kernel_name, dim):
         plt.loglog(h, error, "o-", label=r"$\epsilon_{\mathrm{rel}}$", color=colors[idataset])
         plt.loglog(h, error_uncompressed, "x--",
                 label=fr"$\epsilon_{{\mathrm{{trunc}}}} (p={order})$", color=colors[idataset])
-    
+
     kernel_disp_name = kernel_name.replace("Kernel", "")
     kernel_disp_name = kernel_disp_name.replace("let", "")
     kernel_id = kernel_disp_name.lower()
@@ -48,6 +56,7 @@ def main(kernel_name, dim):
     #r = 1/(100*np.sqrt(dim))
     #plt.axvline(x=r, color="black")
 
+    fix_tikz_legend(plt.gcf())
     tex_file_name = f"figures/error-compare-{kernel_id}-{dim}d.tex"
     tikzplotlib.save(tex_file_name)
     import re

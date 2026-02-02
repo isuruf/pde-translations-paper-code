@@ -1,0 +1,149 @@
+% This file was created with tikzplotlib v0.10.1.
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{gray}{RGB}{128,128,128}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=lightgray204
+},
+log basis x={10},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={Order \(\displaystyle p\)},
+xmajorgrids,
+xmin=1.72620478295848, xmax=44.0272213067016,
+xmode=log,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={FLOP Count},
+ymajorgrids,
+ymin=25.0864873478182, ymax=416223.635339291,
+ymode=log,
+ytick style={color=black},
+xtick={2,4,6,8,10,20,30,40},
+xticklabels={\(\displaystyle { 2 }\),
+\(\displaystyle { 4 }\),
+\(\displaystyle { 6 }\),
+\(\displaystyle { 8 }\),
+\(\displaystyle { 10 }\),
+\(\displaystyle { 20 }\),
+\(\displaystyle { 30 }\),
+\(\displaystyle { 40 }\)},
+ytick={1,10,100,1000,10000,100000,1000000,10000000},
+yticklabels={
+  \(\displaystyle {10^{0}}\),
+  \(\displaystyle {10^{1}}\),
+  \(\displaystyle {10^{2}}\),
+  \(\displaystyle {10^{3}}\),
+  \(\displaystyle {10^{4}}\),
+  \(\displaystyle {10^{5}}\),
+  \(\displaystyle {10^{6}}\),
+  \(\displaystyle {10^{7}}\)
+}
+]
+\addplot [semithick, steelblue31119180, mark=*, mark size=3, mark options={solid}]
+table {%
+2 110
+4 568
+6 1541
+8 3290
+10 6011
+12 9934
+14 15265
+16 22218
+18 31011
+20 41854
+22 54971
+24 70580
+26 88895
+28 110124
+30 134493
+32 162210
+34 193491
+36 228552
+38 267617
+};
+\addlegendentry{M2P Full}
+\addplot [semithick, darkorange25512714, mark=*, mark size=3, mark options={solid}]
+table {%
+2 97
+4 397
+6 856
+8 1496
+10 2312
+12 3306
+14 4476
+16 5820
+18 7340
+20 9036
+22 10908
+24 12956
+26 15182
+28 17582
+30 20158
+32 22910
+34 25838
+36 28942
+38 32222
+};
+\addlegendentry{M2P Compressed}
+\addplot [semithick, gray, dash pattern=on 5.55pt off 2.4pt]
+table {%
+2 89.2576177285319
+4 357.030470914127
+6 803.318559556787
+8 1428.12188365651
+10 2231.4404432133
+12 3213.27423822715
+14 4373.62326869806
+16 5712.48753462604
+18 7229.86703601108
+20 8925.76177285319
+22 10800.1717451524
+24 12853.0969529086
+26 15084.5373961219
+28 17494.4930747922
+30 20082.9639889197
+32 22849.9501385042
+34 25795.4515235457
+36 28919.4681440443
+38 32222
+};
+\addlegendentry{$p^2$}
+\addplot [semithick, red, dash pattern=on 5.55pt off 2.4pt]
+table {%
+2 39.01691208631
+4 312.13529669048
+6 1053.45662633037
+8 2497.08237352384
+10 4877.11401078874
+12 8427.65301064295
+14 13382.8008456043
+16 19976.6589881907
+18 28443.32891092
+20 39016.91208631
+22 51931.5099868786
+24 67421.2240851436
+26 85720.155853623
+28 107062.406764835
+30 131682.078291296
+32 159813.271905526
+34 191690.089080041
+36 227546.63128736
+38 267617
+};
+\addlegendentry{$p^3$}
+\end{axis}
+

@@ -1,0 +1,124 @@
+% This file was created with tikzplotlib v0.10.1.
+
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple148103189}{RGB}{148,103,189}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=lightgray204
+},
+log basis x={10},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={Geometric parameter \(\displaystyle R\)},
+xmajorgrids,
+xmin=0.000740095979741405, xmax=0.329876977693224,
+xmode=log,
+xtick style={color=black},
+xtick={1e-05,0.0001,0.001,0.01,0.1,1,10},
+xticklabels={
+  \(\displaystyle {10^{-5}}\),
+  \(\displaystyle {10^{-4}}\),
+  \(\displaystyle {10^{-3}}\),
+  \(\displaystyle {10^{-2}}\),
+  \(\displaystyle {10^{-1}}\),
+  \(\displaystyle {10^{0}}\),
+  \(\displaystyle {10^{1}}\)
+},
+y grid style={darkgray176},
+ylabel={\(\displaystyle \epsilon_{\mathrm{rel}}\)},
+ymajorgrids,
+ymin=1.07965841938528e-16, ymax=1.034157660686e-15,
+ymode=log,
+ytick style={color=black},
+ytick={1e-15,2e-16},
+yticklabels={
+\(\displaystyle {1e-15}\),
+\(\displaystyle {2e-16}\),
+  \(\displaystyle {10^{-17}}\),
+  \(\displaystyle {10^{-16}}\),
+  \(\displaystyle {10^{-15}}\),
+  \(\displaystyle {10^{-14}}\),
+  \(\displaystyle {10^{-13}}\)
+}
+]
+\addplot [semithick, steelblue31119180, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 1.20148149866584e-16
+0.001953125 1.19644003933456e-16
+0.00390625 1.19833060034111e-16
+0.0078125 1.20951472571248e-16
+0.015625 1.20963660651136e-16
+0.03125 1.22648120389837e-16
+0.0625 1.24802460593231e-16
+0.125 1.27712785954924e-16
+0.25 1.31753808996362e-16
+};
+\addlegendentry{$p=2$}
+\addplot [semithick, darkorange25512714, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 3.32240652649365e-16
+0.001953125 3.31925190746638e-16
+0.00390625 3.31623274595281e-16
+0.0078125 3.30719589128992e-16
+0.015625 3.28203545344894e-16
+0.03125 3.24355739230332e-16
+0.0625 3.15463025078951e-16
+0.125 2.99493932799031e-16
+0.25 2.75675992862378e-16
+};
+\addlegendentry{$p=4$}
+\addplot [semithick, forestgreen4416044, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 4.42576529687906e-16
+0.001953125 4.80060721679788e-16
+0.00390625 5.37140042405825e-16
+0.0078125 5.3149233733443e-16
+0.015625 5.26785352914527e-16
+0.03125 5.19265633183001e-16
+0.0625 5.03125319150543e-16
+0.125 4.72286074613295e-16
+0.25 4.23598585723967e-16
+};
+\addlegendentry{$p=6$}
+\addplot [semithick, crimson2143940, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 4.42575601953759e-16
+0.001953125 4.80093004840884e-16
+0.00390625 5.5532634863384e-16
+0.0078125 6.64186964430168e-16
+0.015625 7.3353213642519e-16
+0.03125 7.22291579106439e-16
+0.0625 7.00748124569285e-16
+0.125 6.55883638644865e-16
+0.25 5.80083314044886e-16
+};
+\addlegendentry{$p=8$}
+\addplot [semithick, mediumpurple148103189, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 4.42593719704064e-16
+0.001953125 4.80119713373637e-16
+0.00390625 5.55284849527054e-16
+0.0078125 6.65729720181771e-16
+0.015625 8.19710897525143e-16
+0.03125 9.33216031413008e-16
+0.0625 9.12043800936895e-16
+0.125 8.52468948357297e-16
+0.25 7.40897039161058e-16
+};
+\addlegendentry{$p=10$}
+\end{axis}
+

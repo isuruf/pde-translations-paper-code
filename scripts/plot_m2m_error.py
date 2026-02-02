@@ -4,6 +4,14 @@ import json
 import tikzplotlib
 
 
+def fix_tikz_legend(obj):
+    """Workaround for matplotlib 3.6+ renamed legend's _ncol to _ncols"""
+    if hasattr(obj, "_ncols"):
+        obj._ncol = obj._ncols
+    for child in obj.get_children():
+        fix_tikz_legend(child)
+
+
 def main(kernel_name, dim):
     plt.clf()
     with open(f"data/{kernel_name}_{dim}D_p2m2m2p_error.json", "r") as inf:
@@ -54,6 +62,7 @@ def main(kernel_name, dim):
     plt.legend(loc="upper left", prop={'size': 10})
     plt.tight_layout()
 
+    fix_tikz_legend(plt.gcf())
     tex_file_name = f"figures/accuracy-{kernel_id}-{dim}d.tex"
     tikzplotlib.save(tex_file_name)
     import re
@@ -89,12 +98,9 @@ def main(kernel_name, dim):
 if __name__ == "__main__":
     #plt.rc("font", size=16)
 
-    main("HeatKernel", 1)
-    main("HeatKernel", 2)
-    main("HeatKernel", 3)
-    #main("HelmholtzKernel", 2)
-    #main("HelmholtzKernel", 3)
-    #main("BiharmonicKernel", 2)
-    #main("BiharmonicKernel", 3)
-    #main("StokesletKernel", 2)
-    #main("StokesletKernel", 3)
+    main("LaplaceKernel", 2)
+    main("LaplaceKernel", 3)
+    main("HelmholtzKernel", 2)
+    main("HelmholtzKernel", 3)
+    main("BiharmonicKernel", 2)
+    main("BiharmonicKernel", 3)
