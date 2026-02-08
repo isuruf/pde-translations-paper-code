@@ -546,8 +546,8 @@ def main(algorithm, fmm_order):
 
     # }}}
 
-    print(rel_err_2)
-    return rel_err_2
+    print(rel_err_inf)
+    return rel_err_inf
 
 
 if __name__ == '__main__':
@@ -558,7 +558,7 @@ if __name__ == '__main__':
         data = []
         all_data[algorithm] = data
         for fmm_order in fmm_orders:
-            rel_err_2 = main(algorithm, fmm_order)
-            data.append(rel_err_2)
+            rel_err_inf = main(algorithm, fmm_order)
+            data.append(rel_err_inf)
             with open('Biharmonic_IE_error.json', 'w') as f:
                 json.dump(all_data, f)
