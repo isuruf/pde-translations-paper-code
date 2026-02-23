@@ -40,8 +40,8 @@ def main(kernel_name, dim):
             continue
         full_flops = data[op]["full_flops"]
         compressed_flops = data[op]["compressed_flops"]
-        plt.loglog(orders, full_flops, "o-", label=f"{op.upper()} Full")
-        plt.loglog(orders, compressed_flops, "o-", label=f"{op.upper()} Compressed")
+        line_full, = plt.loglog(orders, full_flops, "o-", label=f"{op.upper()} Full")
+        line_comp, = plt.loglog(orders, compressed_flops, "o-", label=f"{op.upper()} Compressed")
 
         kernel_disp_name = kernel_name.replace("Kernel", "")
         kernel_disp_name = kernel_disp_name.replace("let", "")
@@ -68,9 +68,9 @@ def main(kernel_name, dim):
         ref_bad_label += "$"
         ref_flops = ref_flops * compressed_flops[point]/ref_flops[point]
         ref_bad_flops = ref_bad_flops * full_flops[point] /ref_bad_flops[point]
-        plt.loglog(orders, ref_flops, "--", color="gray", label=ref_label)
+        plt.loglog(orders, ref_flops, "--", color=line_comp.get_color(), label=ref_label)
         if expected[dim][op][0] != expected[dim][op][1]:
-            plt.loglog(orders, ref_bad_flops, "--", color="red", label=ref_bad_label)
+            plt.loglog(orders, ref_bad_flops, "--", color=line_full.get_color(), label=ref_bad_label)
 
         plt.xlabel("Order $p$", fontsize=15)
         plt.ylabel("FLOP Count", fontsize=15)
