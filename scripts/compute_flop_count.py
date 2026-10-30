@@ -52,7 +52,7 @@ def generate(knl):
             sac = SymbolicAssignmentCollection()
         for i, expr in enumerate(exprs):
             sac.assign_unique('coeff%d' % i, expr)
-        sac.run_global_cse()
+        sac = sac.run_global_cse()
         insns = to_loopy_insns(sac.assignments.items())
         counter = pymbolic.mapper.flop_counter.CSEAwareFlopCounter()
         s = 0
