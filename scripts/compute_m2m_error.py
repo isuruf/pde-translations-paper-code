@@ -60,7 +60,7 @@ def generate(knl, assumption=True):
         max_order = 12
 
     if assumption:
-        h_values = 2.0**np.arange(-10, -1)
+        h_values = 2.0**np.arange(-10, -2)
     else:
         h_values = 2.0**np.arange(-10, -3)
 
