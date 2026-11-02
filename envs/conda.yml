@@ -1,34 +1,27 @@
-name: test-conda-env-py3
+name: paper
 channels:
 - conda-forge
 - nodefaults
 dependencies:
-- numpy
-- sympy
+- python=3.14
+- numpy=2.4.2
+- scipy=1.17.0
+- sympy=1.14.0
 - pocl
-- islpy
-- pyopencl
-- python=3.9
-- python-symengine
-#- pyfmmlib
-- cython
-- pyvkfft
-- pytools
-- pip
-- pymbolic
+- pyopencl=2026.1.1
+- islpy=2026.1
+- pyvkfft=2025.1.1
+- pytools=2025.2.5
+- pymbolic=2025.1
 - codepy
 - modepy
 - genpy
 - colorama
 - mako
-- pyrsistent
-- immutables
-- pytest
-- types-dataclasses
+- constantdict
 - recursivenodes
-
-- matplotlib-base
-- tikzplotlib
-
+- typing_extensions
+- matplotlib-base=3.10.8
+- pip
 - git
 - compilers

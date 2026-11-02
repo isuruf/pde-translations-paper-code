@@ -1,26 +1,47 @@
 #!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")"
 
-MINIFORGE_HOME=${HOME}/.miniforge
+MINIFORGE_HOME=${MINIFORGE_HOME:-${HOME}/.miniforge}
+MINIFORGE_VERSION=26.9.4-1
 
-MINIFORGE_URL="https://github.com/conda-forge/miniforge/releases/download/4.12.0-2"
-MINIFORGE_FILE="Mambaforge-$(uname)-$(uname -m).sh"
-curl -L -O "${MINIFORGE_URL}/${MINIFORGE_FILE}"
-rm -rf ${MINIFORGE_HOME}
-bash $MINIFORGE_FILE -b -p ${MINIFORGE_HOME}
+if [[ ! -x "$MINIFORGE_HOME/bin/conda" ]]; then
+    installer_os=$(uname -s)
+    if [[ "$installer_os" == Darwin ]]; then
+        installer_os=MacOSX
+    fi
+    installer_dir=$(mktemp -d)
+    installer="$installer_dir/Miniforge3.sh"
+    trap 'rm -rf "$installer_dir"' EXIT
+    curl --fail --location --retry 3 --silent --show-error \
+        "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${installer_os}-$(uname -m).sh" \
+        --output "$installer"
+    bash "$installer" -b -p "$MINIFORGE_HOME"
+fi
 
-source ${MINIFORGE_HOME}/bin/activate
+source "$MINIFORGE_HOME/etc/profile.d/conda.sh"
+for name in paper paper-plot; do
+    if [[ -e "$MINIFORGE_HOME/envs/$name" ]]; then
+        echo "Environment $MINIFORGE_HOME/envs/$name already exists; use a fresh MINIFORGE_HOME." >&2
+        exit 1
+    fi
+done
 
-mamba create --yes --name paper --file "envs/$(uname)-$(uname -m).txt"
+platform="$(uname -s)-$(uname -m)"
+conda create --yes --prefix "$MINIFORGE_HOME/envs/paper" --file "envs/$platform.txt"
+conda create --yes --prefix "$MINIFORGE_HOME/envs/paper-plot" --file "envs/$platform-plot.txt"
+conda activate "$MINIFORGE_HOME/envs/paper"
 
-source activate paper
+python -m pip install \
+    "git+https://github.com/inducer/loopy.git@476a6e1a6e3dd27a6cbaac467439de25638050e2" \
+    "git+https://github.com/inducer/arraycontext.git@94cff7dd0735793c0d6534211059562cb0765b06" \
+    "git+https://github.com/inducer/boxtree.git@5b9c44886fe47236a0aae78bc1989fcca9da32ef" \
+    "git+https://github.com/inducer/gmsh_interop.git@586f6696ddff7ebe97282bbdd7750c7b8b4e3bcf" \
+    "git+https://github.com/inducer/meshmode.git@bbaf4ab4ecfb3b1cfcdac79165d4ca61fe0de64a" \
+    "git+https://github.com/inducer/sumpy.git@c435f826adfaa38404c7389fb4c737bf558cb581" \
+    "git+https://github.com/inducer/pytential.git@8700a2918085572ae86ace15a0beb2f106458bb2" \
+    "git+https://github.com/inducer/modepy.git@01ac7955d30e248e460ccd751d40da4b0ff3e3e6"
 
-pip install \
-    "git+https://github.com/inducer/loopy.git@0239627c15bc2528291a008b3ae47f064b99da86#egg=loopy" \
-    "git+https://github.com/inducer/arraycontext.git@8d7c872ea33f5e6f6251fc9e00c6944f8d15f3a9#egg=arraycontext" \
-    "git+https://github.com/inducer/boxtree.git@e5c1d88c5eec4cb2cc7e466961d126b9c58f853c#egg=boxtree" \
-    "git+https://github.com/inducer/gmsh_interop.git@bb219ca1173512d741b9ce1cb2e3dee4179e78c1#egg=gmsh_interop" \
-    "git+https://github.com/inducer/meshmode.git@c798a6d14e1a7feb13efea52a1cc49456d80e48f#egg=meshmode" \
-    "git+https://github.com/inducer/sumpy.git@1c6858e30e952f6a337f46d941b48102cc6b46a2#egg=sumpy" \
-    "git+https://github.com/inducer/pytential.git@b535d0ea869a53e8dd8ff4f9162d56fa19b4c66a#egg=pytential"
-
-
+python -m pip install --force-reinstall --no-deps \
+    "git+https://github.com/inducer/pymbolic.git@6e66a223597b9b0f719c7cac1b4f59f95e651b64"
+python -m pip check
