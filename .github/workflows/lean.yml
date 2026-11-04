@@ -1,0 +1,111 @@
+name: Lean
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ELAN_HOME: ${{ github.workspace }}/.elan
+  XDG_CACHE_HOME: ${{ github.workspace }}/.cache
+
+jobs:
+  build:
+    name: Build Lean
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lean
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache elan
+        uses: actions/cache@v4
+        with:
+          path: .elan/
+          key: ${{ runner.os }}-elan-${{ hashFiles('lean/lean-toolchain') }}
+
+      - name: Cache mathlib downloads
+        uses: actions/cache@v4
+        with:
+          path: .cache/mathlib/
+          key: ${{ runner.os }}-lean-downloads-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}
+
+      - name: Cache Lean workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            lean/.lake/packages/
+            lean/.lake/build/
+          key: ${{ runner.os }}-lean-workspace-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}
+
+      - name: Set up elan
+        run: |
+          echo "$ELAN_HOME/bin" >> "$GITHUB_PATH"
+          if [ ! -x "$ELAN_HOME/bin/elan" ]; then
+            curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --no-modify-path
+          fi
+
+      - name: Prepare Lean dependencies
+        run: |
+          if [ ! -d .lake/packages/mathlib/.git ]; then
+            lake update
+          fi
+          lake exe cache get
+
+      - name: Build
+        run: lake build
+
+  lint:
+    name: Lint Lean
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lean
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache elan
+        uses: actions/cache@v4
+        with:
+          path: .elan/
+          key: ${{ runner.os }}-elan-${{ hashFiles('lean/lean-toolchain') }}
+
+      - name: Cache mathlib downloads
+        uses: actions/cache@v4
+        with:
+          path: .cache/mathlib/
+          key: ${{ runner.os }}-lean-downloads-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}
+
+      - name: Cache Lean workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            lean/.lake/packages/
+            lean/.lake/build/
+          key: ${{ runner.os }}-lean-workspace-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}
+
+      - name: Set up elan
+        run: |
+          echo "$ELAN_HOME/bin" >> "$GITHUB_PATH"
+          if [ ! -x "$ELAN_HOME/bin/elan" ]; then
+            curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --no-modify-path
+          fi
+
+      - name: Prepare Lean dependencies
+        run: |
+          if [ ! -d .lake/packages/mathlib/.git ]; then
+            lake update
+          fi
+          lake exe cache get
+
+      - name: Lint
+        run: lake lint
