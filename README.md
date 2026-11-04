@@ -27,7 +27,7 @@ The default OpenCL device is `0:0`; override `PYOPENCL_CTX` to select another.
 
     cd lean
     lake exe cache get
-    lean build
+    lake build
 
 ### Build Docker image
 
