@@ -1,6 +1,6 @@
 # Automatic Synthesis of Low-Complexity Translation Operators for the Fast Multipole Method
 
-Isuru Fernando, Shawn Lin and Andreas Kloeckner
+Isuru Fernando, Chaoqi Lin and Andreas Kloeckner
 
 [Arxiv](https://arxiv.org/abs/2305.17867)
 
