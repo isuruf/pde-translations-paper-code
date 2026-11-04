@@ -1,3 +1,12 @@
+# Automatic Synthesis of Low-Complexity Translation Operators for the Fast Multipole Method
+
+Isuru Fernando, Shawn Lin and Andreas Kloeckner
+
+[Arxiv](https://arxiv.org/abs/2305.17867)
+
+This repository contains numerical experiments and Lean code verifying the theoretical
+claims of the paper.
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6638926.svg)](https://doi.org/10.5281/zenodo.6638926)
 
 ### Run Lean verification
