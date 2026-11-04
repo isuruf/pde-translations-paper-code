@@ -1,5 +1,11 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6638926.svg)](https://doi.org/10.5281/zenodo.6638926)
 
+### Run Lean verification
+
+    cd lean
+    lake exe cache get
+    lean build
+
 ### Build Docker image
 
     docker build -f Dockerfile . -t pde-translations-paper-code

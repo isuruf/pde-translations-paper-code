@@ -1,0 +1,21 @@
+name = "pde_translations"
+defaultTargets = ["PDETranslations"]
+
+builtinLint = true
+
+[leanOptions]
+autoImplicit = false
+
+[[lean_lib]]
+name = "PDETranslations"
+
+[[lean_exe]]
+name = "exportLinks"
+root = "ExportLinks"
+srcDir = "../lean-links"
+supportInterpreter = true
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.35.0"
