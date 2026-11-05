@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm-slim
 LABEL maintainer="idf2@illinois.edu"
 
 RUN apt-get update \
@@ -8,19 +8,15 @@ RUN apt-get update \
 
 RUN useradd -ms /bin/bash paper
 USER paper
-
-# Install latexrun script
-RUN mkdir /home/paper/bin
-WORKDIR /home/paper/bin
-
-# Install Conda environment
-RUN mkdir /home/paper/pde-translations-results
+RUN mkdir -p /home/paper/pde-translations-results
 WORKDIR /home/paper/pde-translations-results
+
 COPY --chown=paper envs envs
 COPY --chown=paper install.sh install.sh
 RUN ./install.sh \
     && /home/paper/.miniforge/bin/conda clean --all --yes
 
-# Copy the scripts for running the experiments
 COPY --chown=paper scripts scripts
 COPY --chown=paper run.sh run.sh
+ENV PYOPENCL_CTX=0:0 MPLBACKEND=Agg SUMPY_FORCE_SYMBOLIC_BACKEND=sympy
+CMD ["/bin/bash", "run.sh"]

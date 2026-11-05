@@ -1,0 +1,10 @@
+name: paper-plot
+channels:
+- conda-forge
+- nodefaults
+dependencies:
+- python=3.10
+- numpy=1.26.4
+- matplotlib-base=3.5.3
+- tikzplotlib=0.10.1
+- webcolors=1.12

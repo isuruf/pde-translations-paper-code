@@ -31,7 +31,7 @@ def main(kernel_name, dim):
         plt.loglog(h, error, "o-", label=r"$\epsilon_{\mathrm{rel}}$", color=colors[idataset])
         plt.loglog(h, error_uncompressed, "x--",
                 label=fr"$\epsilon_{{\mathrm{{trunc}}}} (p={order})$", color=colors[idataset])
-    
+
     kernel_disp_name = kernel_name.replace("Kernel", "")
     kernel_disp_name = kernel_disp_name.replace("let", "")
     kernel_id = kernel_disp_name.lower()

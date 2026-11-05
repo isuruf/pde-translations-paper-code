@@ -32,7 +32,7 @@ def main(kernel_name, dim):
         error = np.array(dataset["error"])
         order = dataset["order"]
 
-        if order in [min(orders), max(orders)] and kernel_name in ("HelmholtzKernel", "HeatKernel"):
+        if order in [min(orders), max(orders)] and kernel_name == "HelmholtzKernel":
             ref_point = -1
             ref_h = np.linspace(h[0], h[-1])
             ref_err = error[ref_point]*(ref_h/ref_h[ref_point])**(order+1)
@@ -89,12 +89,9 @@ def main(kernel_name, dim):
 if __name__ == "__main__":
     #plt.rc("font", size=16)
 
-    main("HeatKernel", 1)
-    main("HeatKernel", 2)
-    main("HeatKernel", 3)
-    #main("HelmholtzKernel", 2)
-    #main("HelmholtzKernel", 3)
-    #main("BiharmonicKernel", 2)
-    #main("BiharmonicKernel", 3)
-    #main("StokesletKernel", 2)
-    #main("StokesletKernel", 3)
+    main("LaplaceKernel", 2)
+    main("LaplaceKernel", 3)
+    main("HelmholtzKernel", 2)
+    main("HelmholtzKernel", 3)
+    main("BiharmonicKernel", 2)
+    main("BiharmonicKernel", 3)

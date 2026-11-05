@@ -52,7 +52,7 @@ def generate(knl):
             sac = SymbolicAssignmentCollection()
         for i, expr in enumerate(exprs):
             sac.assign_unique('coeff%d' % i, expr)
-        sac.run_global_cse()
+        sac = sac.run_global_cse()
         insns = to_loopy_insns(sac.assignments.items())
         counter = pymbolic.mapper.flop_counter.CSEAwareFlopCounter()
         s = 0
@@ -86,7 +86,7 @@ def generate(knl):
             m_expn = mpole_expn_class(knl, order=order)
             l_expn = local_expn_class(
                 kernel=knl, order=order,
-                m2l_translation=m2l_translation)
+                m2l_translation_override=m2l_translation)
 
             src_coeff_exprs = [
                 sym.Symbol(f'src_coeff{i}') for i in range(len(m_expn))]

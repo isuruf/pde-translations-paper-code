@@ -4,10 +4,11 @@ Also need https://gitlab.tiker.net/inducer/sumpy/merge_requests/113
 """
 
 import pyopencl as cl
+from arraycontext import PyOpenCLArrayContext
 import sumpy.toys as t
 import numpy as np
 from sumpy.kernel import (HelmholtzKernel, LaplaceKernel,  # noqa: F401
-                          BiharmonicKernel, HeatKernel)
+                          BiharmonicKernel)
 import sys
 
 from sumpy.expansion.multipole import (
@@ -25,8 +26,6 @@ def generate(knl, assumption=True):
             extra_kernel_kwargs = {'k': 1}
         else:
             extra_kernel_kwargs = {'k': 50}
-    if isinstance(knl, HeatKernel):
-        extra_kernel_kwargs = {'alpha': 0.1}
 
     dim = knl.dim
 
@@ -54,12 +53,14 @@ def generate(knl, assumption=True):
     weights = np.random.rand(sources_grid.shape[-1])
 
     ctx = cl.create_some_context()
+    queue = cl.CommandQueue(ctx)
+    actx = PyOpenCLArrayContext(queue)
     max_order = 12
     if dim == 2 and isinstance(knl, HelmholtzKernel):
         max_order = 12
 
     if assumption:
-        h_values = 2.0**np.arange(-10, -1)
+        h_values = 2.0**np.arange(-10, -2)
     else:
         h_values = 2.0**np.arange(-10, -3)
 
@@ -93,7 +94,6 @@ def generate(knl, assumption=True):
             for i, (mpole_expn_class, local_expn_class) in \
                     enumerate(zip(mpole_expn_classes, local_expn_classes)):
                 tctx = t.ToyContext(
-                    ctx,
                     knl,
                     extra_kernel_kwargs=extra_kernel_kwargs,
                     local_expn_class=local_expn_class,
@@ -106,19 +106,21 @@ def generate(knl, assumption=True):
                 )
 
                 mexp = t.multipole_expand(
+                    actx,
                     pt_src,
                     center=mpole_center.reshape(dim),
                     order=order,
                     rscale=h/order)
                 mexp2 = t.multipole_expand(
+                    actx,
                     mexp,
                     center=second_center.reshape(dim),
                     order=order,
                     rscale=h/order)
-                m2m_vals[i] = mexp2.eval(targets)
+                m2m_vals[i] = mexp2.eval(actx, targets)
                 if not assumption:
                     if direct_vals[ih] is None:
-                        direct = pt_src.eval(targets)
+                        direct = pt_src.eval(actx, targets)
                         direct_vals[ih] = direct
                     else:
                         direct = direct_vals[ih]
@@ -141,7 +143,6 @@ def generate(knl, assumption=True):
 
         import json
         name = type(knl).__name__
-        spatial_dim = dim - 1 if name == "HeatKernel" else dim
         if assumption:
             fname = f'{name}_{dim}D_p2m2m2p_error.json'
         else:
